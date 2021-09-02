@@ -309,10 +309,13 @@ void bfs (Nodo * nodoIni){
 		Nodo * actual = colaBFS.front();
 		colaBFS.pop();
 
-		if(actual->getEstadoFinal()) cout << actual->getIndice() << " es el final \n";
+		//if(actual->getEstadoFinal()) cout << actual->getIndice() << " es el final \n";
 
 		for(int i = 0; i < actual->getSize(); i++){
-			cout << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " con " << actual->getTransicion(i) << endl;
+			//cout << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " con " << actual->getTransicion(i) << endl;
+			//string label = " [label=" + actual->getTransicion(i);
+			//Para la impresion en formato dot
+			cout << "\t" << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " [label = \"" << actual->getTransicion(i) << "\"]\n"; 
 			Nodo * u = actual->getArista(i).first; 
 			if(!vis[u]){
 				vis[u] = true;
@@ -331,6 +334,11 @@ const string p2 = "('a|'b)'|('a'b|'c)'";
 const string prueba = "('a'+|' )''a'b('c'a|'c'+d)'";
 //const string p3 = "'a'+b|'f'r"; 
 
+//Para darle formato a nuestra expresion regular
+string formatearExpresionRegular(const string& expresionRegular){
+	return expresionRegular;
+}
+
 int main (){
 
 	string expresionRegular;
@@ -338,15 +346,24 @@ int main (){
 
 	expresionRegular = prueba;
 
-	cout << expresionRegular << endl;
+	//cout << expresionRegular << endl;
 
 	int idx = 0;
 	auto afn = ExpresionRegularAAFN(expresionRegular, 0, expresionRegular.size() -1, idx);
 
-    //Funcion de impresion mediante una bfs
-	cout << "\nBFS:\n";
+    //Funcion de impresion mediante una bfs, se imprime en el formato que pide el .dot
+	//cout << "\nBFS:\n";
+	cout << "digraph AFN {\n";
+
 	bfs(afn.first);
-    cout << endl;
+    cout << "}";
+
+
+    //Generar el .dot
+    /*
+    nano ejemplo.dot (escribir el archivo)
+    dot -Tpng -O ejemplo.dot
+    */
 
     return 0;
 }
