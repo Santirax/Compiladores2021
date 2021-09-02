@@ -1,6 +1,3 @@
-/*
-    Copy paste de la practica pasada, es un codigo viejo.
-*/
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -300,102 +297,56 @@ AF ExpresionRegularAAFN(const ExpresionRegular& expresionRegular, int inicio, in
 	return AF(actual, nodo_final);
 }
 
-//Solo nos importa la parte del AFN
-/*
-set<Nodo*> estadoCerraduraEpsilon(set<Nodo*> conjunto){
-	stack<Nodo*> pila;
-	vector<bool> visitados(100000, false);
+map <Nodo *, bool> vis;
+void bfs (Nodo * nodoIni){
+	vis[nodoIni] = true;
+	queue<Nodo *> colaBFS;
 
-	set<Nodo*> cerraduraEpsilon;
-	for(auto nodo : conjunto){
-		visitados[nodo->getIndice()] = true;
-		cerraduraEpsilon.insert(nodo);
-		pila.push(nodo);
+	colaBFS.push(nodoIni);
+
+	while(!colaBFS.empty()){
+
+		Nodo * actual = colaBFS.front();
+		colaBFS.pop();
+
+		if(actual->getEstadoFinal()) cout << actual->getIndice() << " es el final \n";
+
+		for(int i = 0; i < actual->getSize(); i++){
+			cout << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " con " << actual->getTransicion(i) << endl;
+			Nodo * u = actual->getArista(i).first; 
+			if(!vis[u]){
+				vis[u] = true;
+				colaBFS.push(u);
+			} 
+		} 
+
 	}
-
-	while(!pila.empty()){
-		Nodo* actual = pila.top();
-		pila.pop();
-
-		cerraduraEpsilon.insert(actual);
-
-		for(int i = 0; i < actual->getSize(); ++i){
-			if(actual->getTransicion(i) == '?'){		
-				if(visitados[actual->getHijo(i)->getIndice()]) continue;
-				visitados[actual->getHijo(i)->getIndice()] = true;
-				pila.push(actual->getHijo(i));
-			}
-		}
-	} return cerraduraEpsilon;
 }
-*/
 
-//Este cuenta como el AFD
-/*Nodo* TransformaAFN(Nodo* AFN, const string& abecedario, Nodo* nodo_final){
-	int indice = 0;
-	
-	Nodo* AFD = new Nodo(indice++, false);
+//Despues de hacer pruebas me di cuenta que propuse una sintaxis con comillas simples
+//para que fuera mas sencilla la implementacion
 
-	//kernel, nodo
-	map<set<Nodo*>, Nodo*> visitados;
-	stack< pair<set<Nodo*>, Nodo*> > pila;
+const string p1 = "('a|'b)'";
+const string p2 = "('a|'b)'|('a'b|'c)'";
+const string prueba = "('a'+|' )''a'b('c'a|'c'+d)'";
+//const string p3 = "'a'+b|'f'r"; 
 
-	set<Nodo*> conjuntoEAFN; conjuntoEAFN.insert(AFN);
-	
-	pila.push(make_pair(conjuntoEAFN, AFD));
-	visitados[pila.top().first] = pila.top().second;
-	
-	while(!pila.empty()){
-		set<Nodo*> kernelActual = pila.top().first;
-		Nodo* nodo_actual = pila.top().second;
-		pila.pop();
-
-		set<Nodo*> conjuntoEpsilonActual = estadoCerraduraEpsilon(kernelActual);
-		for(auto nodo : conjuntoEpsilonActual){
-			if(nodo->getIndice() == nodo_final->getIndice()){
-				nodo_actual->cambiaEstadoFinal(true); break;
-			}
-		}
-
-		for(int k = 0; k < abecedario.size(); ++k){
-			bool huboTransicion = false;
-			set<Nodo*> nuevoConjunto;
-			for(auto nodo: conjuntoEpsilonActual){
-				for(int j = 0; j < nodo->getSize(); ++j){
-					if(nodo->getTransicion(j) == abecedario[k]){
-						nuevoConjunto.insert(nodo->getHijo(j));
-						huboTransicion = true;
-					}
-				}
-			}
-
-			if(!huboTransicion) continue;
-
-			Nodo* nodo_creado;
-			if(visitados.find(nuevoConjunto) == visitados.end()){
-				nodo_creado = new Nodo(indice++, false);
-				visitados[nuevoConjunto] = nodo_creado;
-				pila.push(make_pair(nuevoConjunto, nodo_creado));
-			} else {
-				nodo_creado = visitados[nuevoConjunto];
-			} nodo_actual->agregaArista(nodo_creado, abecedario[k]);
-		}	
-	}
-	return AFD;
-}*/
-
- 
 int main (){
 
 	string expresionRegular;
-	cin>>expresionRegular;
+	//cin>>expresionRegular;
+
+	expresionRegular = prueba;
 
 	cout << expresionRegular << endl;
 
 	int idx = 0;
 	auto afn = ExpresionRegularAAFN(expresionRegular, 0, expresionRegular.size() -1, idx);
 
-    //Hacer una funcion de impresion, se puede hacer con una bfs
+    //Funcion de impresion mediante una bfs
+	cout << "\nBFS:\n";
+	bfs(afn.first);
+    cout << endl;
 
     return 0;
 }
