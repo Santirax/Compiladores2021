@@ -309,11 +309,7 @@ void bfs (Nodo * nodoIni){
 		Nodo * actual = colaBFS.front();
 		colaBFS.pop();
 
-		//if(actual->getEstadoFinal()) cout << actual->getIndice() << " es el final \n";
-
 		for(int i = 0; i < actual->getSize(); i++){
-			//cout << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " con " << actual->getTransicion(i) << endl;
-			//string label = " [label=" + actual->getTransicion(i);
 			//Para la impresion en formato dot
 			cout << "\t" << actual->getIndice() << " -> " << actual->getHijo(i)->getIndice() << " [label = \"" << actual->getTransicion(i) << "\"]\n"; 
 			Nodo * u = actual->getArista(i).first; 
@@ -332,38 +328,88 @@ void bfs (Nodo * nodoIni){
 const string p1 = "('a|'b)'";
 const string p2 = "('a|'b)'|('a'b|'c)'";
 const string prueba = "('a'+|' )''a'b('c'a|'c'+d)'";
-//const string p3 = "'a'+b|'f'r"; 
 
-//Para darle formato a nuestra expresion regular
+const string origial = "(a+|E)ab(ca|c+d)";
+const string formateada = "('a'+|' )''a'b('c'a|'c'+d)'";
+
+//Para darle formato a nuestra expresion regular, la expresion regular tiene que ser valida
 string formatearExpresionRegular(const string& expresionRegular){
-	return expresionRegular;
+
+	string expresionFormateada = "";
+	for( int i = 0; i < (int)expresionRegular.size(); i++ ){
+
+		if(i == 0){
+			
+			if(expresionRegular[i] >= 'a' && expresionRegular[i] <= 'z'){
+				expresionFormateada = '\'' + expresionRegular[i];
+			} else if (expresionRegular[i] == 'E') {
+				expresionFormateada = '\'' + ' ';
+			} else {
+				expresionFormateada += expresionRegular[i];
+			}
+
+		} else {
+
+			if(expresionRegular[i] >= 'a' && expresionRegular[i] <= 'z'){
+			
+				expresionFormateada.push_back('\'');
+				expresionFormateada.push_back(expresionRegular[i]);
+			
+			} else if (expresionRegular[i] == 'E') {
+
+				expresionFormateada.push_back('\'');
+				expresionFormateada.push_back(' ');
+			
+			} else if (expresionRegular[i] == '+'){
+
+				expresionFormateada.push_back('\'');
+				expresionFormateada.push_back(expresionRegular[i]);
+				expresionFormateada.push_back(expresionRegular[i+1]);
+				i++;
+				
+			} else if (expresionRegular[i] == '*'){
+
+				expresionFormateada.push_back('\'');
+				expresionFormateada.push_back('*');
+
+			} else if(expresionRegular[i] == ')'){
+
+				expresionFormateada.push_back(')');
+				expresionFormateada.push_back('\'');
+
+			} else {
+				expresionFormateada.push_back(expresionRegular[i]);
+			}
+
+		}
+
+	}
+	return expresionFormateada;
 }
+
+string origin = "(a+|E)ab(ca|c+d)";
+string format = "('a'+|' )''a'b('c'a|'c'+d)'";
 
 int main (){
 
 	string expresionRegular;
-	//cin>>expresionRegular;
+	cin>>expresionRegular;
 
-	expresionRegular = prueba;
+	// expresionRegular = origin;
 
-	//cout << expresionRegular << endl;
+	string expresionFormateada = formatearExpresionRegular(expresionRegular);
+
+	cout << "# Expresion original: " << expresionRegular << endl;
+	cout << "# Expresion formateada: " << expresionFormateada << endl;
 
 	int idx = 0;
-	auto afn = ExpresionRegularAAFN(expresionRegular, 0, expresionRegular.size() -1, idx);
+	auto afn = ExpresionRegularAAFN(expresionFormateada, 0, expresionFormateada.size() -1, idx);
 
     //Funcion de impresion mediante una bfs, se imprime en el formato que pide el .dot
-	//cout << "\nBFS:\n";
 	cout << "digraph AFN {\n";
-
+	cout << "rankdir = LR\n"; // Grafo de izquierda a derecha
 	bfs(afn.first);
     cout << "}";
-
-
-    //Generar el .dot
-    /*
-    nano ejemplo.dot (escribir el archivo)
-    dot -Tpng -O ejemplo.dot
-    */
 
     return 0;
 }
